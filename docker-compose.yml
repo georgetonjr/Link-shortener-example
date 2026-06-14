@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  cassandra:
+    image: cassandra:4.1
+    container_name: link-shortener-cassandra
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=link_shortener_cluster
+      - CASSANDRA_DC=dc1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+
+  redis:
+    image: redis:7-alpine
+    container_name: link-shortener-redis
+    ports:
+      - "6379:6379"
+    # allkeys-lru: links mais acessados permanecem naturalmente em cache (ver tasks/04-redirect.md)
+    command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - redis_data:/data
+
+volumes:
+  cassandra_data:
+  redis_data:
