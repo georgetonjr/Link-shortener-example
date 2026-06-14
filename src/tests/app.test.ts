@@ -1,9 +1,9 @@
 import { describe, expect, it } from '@jest/globals';
-import { createApp } from '@/application/app';
+import { createTestApp } from '@/tests/helpers/create-test-app';
 
 describe('GET /health', () => {
   it('returns status ok', async () => {
-    const app = createApp();
+    const { app } = createTestApp();
 
     const response = await app.request('/health');
 

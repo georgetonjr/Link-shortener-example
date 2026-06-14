@@ -1,9 +1,9 @@
 import { describe, expect, it } from '@jest/globals';
-import { createApp } from '@/application/app';
+import { createTestApp } from '@/tests/helpers/create-test-app';
 
 describe('requestId middleware', () => {
   it('generates a requestId and returns it in the response header', async () => {
-    const app = createApp();
+    const { app } = createTestApp();
 
     const response = await app.request('/health');
 
@@ -11,7 +11,7 @@ describe('requestId middleware', () => {
   });
 
   it('propagates an incoming x-request-id header', async () => {
-    const app = createApp();
+    const { app } = createTestApp();
     const incomingId = 'test-request-id-123';
 
     const response = await app.request('/health', {
