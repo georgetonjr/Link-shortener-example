@@ -1,11 +1,14 @@
 import type { ShortUrl } from '@/domain/entities/short-url';
 import type { ShortUrlRepository } from '@/domain/repository/short-url-repository';
 import type { ShortUrlCache } from '@/domain/services/short-url-cache';
-import type { AccessStatsRecorder } from '@/domain/services/access-stats-recorder';
+import type { RegisterAccessUseCase } from '@/domain/usecase/register-access';
 import { GoneError, NotFoundError } from '@/domain/shared/errors';
 
 export type RedirectUrlInput = {
   code: string;
+  referrer: string | null;
+  userAgent: string | null;
+  ip: string | null;
 };
 
 export type RedirectUrlOutput = {
@@ -23,7 +26,7 @@ export class RedirectUrlUseCase {
   constructor(
     private readonly shortUrlRepository: ShortUrlRepository,
     private readonly shortUrlCache: ShortUrlCache,
-    private readonly accessStatsRecorder: AccessStatsRecorder,
+    private readonly registerAccess: RegisterAccessUseCase,
   ) {}
 
   async execute(input: RedirectUrlInput): Promise<RedirectUrlOutput> {
@@ -37,7 +40,14 @@ export class RedirectUrlUseCase {
       throw new GoneError('Short URL has expired');
     }
 
-    await this.accessStatsRecorder.recordAccess(input.code);
+    // Fire-and-forget: registro de acesso não deve bloquear o redirecionamento
+    // (ver tasks/05-stats.md - decision). RegisterAccessUseCase nunca lança erro.
+    void this.registerAccess.execute({
+      shortcode: shortUrl.shortcode,
+      referrer: input.referrer,
+      userAgent: input.userAgent,
+      ip: input.ip,
+    });
 
     return { originalUrl: shortUrl.originalUrl };
   }

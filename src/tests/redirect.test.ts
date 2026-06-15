@@ -32,7 +32,7 @@ describe('GET /:shortcode', () => {
         expiresAt: null,
         createdAt: '2026-01-01T00:00:00.000Z',
       }));
-    const execute = jest.fn<CassandraClient['execute']>();
+    const execute = jest.fn<CassandraClient['execute']>().mockResolvedValue([]);
 
     const { app } = createTestApp({ execute }, { get });
 
@@ -40,7 +40,12 @@ describe('GET /:shortcode', () => {
 
     expect(response.status).toBe(302);
     expect(response.headers.get('location')).toBe('https://example.com/cached');
-    expect(execute).not.toHaveBeenCalled();
+    // Não consulta short_url_codes no Cassandra (cache hit); o único acesso ao
+    // Cassandra é o INSERT do access log (registro de estatística, fire-and-forget).
+    expect(execute).not.toHaveBeenCalledWith(
+      expect.stringContaining('short_url_codes'),
+      expect.anything(),
+    );
   });
 
   it('redirects to the original URL on a cache miss, querying Cassandra and populating the cache', async () => {

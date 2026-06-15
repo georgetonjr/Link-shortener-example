@@ -5,4 +5,7 @@
  */
 export interface AccessStatsRecorder {
   recordAccess(shortcode: string): Promise<void>;
+
+  /** Total de acessos registrados para o shortcode (ver tasks/05-stats.md). */
+  getAccessCount(shortcode: string): Promise<number>;
 }
