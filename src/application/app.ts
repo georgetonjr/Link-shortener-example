@@ -4,12 +4,15 @@ import type { AppBindings, AppVariables } from '@/application/shared/app-context
 import { errorHandler } from '@/application/shared/error-handler';
 import { requestIdMiddleware } from '@/application/shared/request-id-middleware';
 import { createAuthController } from '@/application/controller/auth-controller';
+import { createShortUrlController } from '@/application/controller/short-url-controller';
 import type { CassandraClient } from '@/infra/cassandra/client';
+import type { RedisClient } from '@/infra/redis/client';
 
 export type App = Hono<{ Bindings: AppBindings; Variables: AppVariables }>;
 
 export type AppDependencies = {
   cassandra: CassandraClient;
+  redis: RedisClient;
 };
 
 /**
@@ -29,6 +32,7 @@ export function createApp(dependencies: AppDependencies): App {
   app.get('/health', (c) => c.json({ status: 'ok' }));
 
   app.route('/auth', createAuthController(dependencies.cassandra));
+  app.route('/urls', createShortUrlController(dependencies.cassandra, dependencies.redis));
 
   app.onError(errorHandler);
 

@@ -10,7 +10,7 @@ async function bootstrap(): Promise<void> {
 
   await Promise.all([cassandra.connect(), redis.connect()]);
 
-  const app = createApp({ cassandra });
+  const app = createApp({ cassandra, redis });
 
   Bun.serve({ fetch: app.fetch, port: env.PORT });
   logger.info({ port: env.PORT, env: env.ENV }, 'Server started');
