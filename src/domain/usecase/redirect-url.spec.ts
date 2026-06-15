@@ -10,11 +10,15 @@ function buildDeps() {
   const shortUrlRepository = {
     findByCode: jest.fn<ShortUrlRepository['findByCode']>(),
     create: jest.fn<ShortUrlRepository['create']>(),
+    findManyByUserId: jest.fn<ShortUrlRepository['findManyByUserId']>(),
+    update: jest.fn<ShortUrlRepository['update']>(),
+    delete: jest.fn<ShortUrlRepository['delete']>(),
   } satisfies ShortUrlRepository;
 
   const shortUrlCache = {
     get: jest.fn<ShortUrlCache['get']>(),
     set: jest.fn<ShortUrlCache['set']>(),
+    delete: jest.fn<ShortUrlCache['delete']>(),
   } satisfies ShortUrlCache;
 
   const registerAccess = {

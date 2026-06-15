@@ -8,4 +8,7 @@ import type { ShortUrl } from '@/domain/entities/short-url';
 export interface ShortUrlCache {
   get(code: string): Promise<ShortUrl | null>;
   set(code: string, shortUrl: ShortUrl): Promise<void>;
+
+  /** Invalida a entrada em cache (ver tasks/06-manage-urls.md - alteração/remoção de links). */
+  delete(code: string): Promise<void>;
 }
