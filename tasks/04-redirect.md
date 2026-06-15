@@ -2,16 +2,16 @@
 Funcionalidade de redirecionamento: ao acessar a URL encurtada, redirecionar para a URL original, respeitando expiração e registrando estatísticas de acesso.
 
 # tarefas
-- Criar usecase redirect-url:
-  - Buscar shortcode no cache Redis (cache-aside); em cache miss, buscar no cassandra (consistency level ONE) e popular o Redis com TTL
-  - Validar se a URL não expirou (retornar 410 Gone se expirada)
-  - Incrementar contador de acessos do shortcode (ex: Redis)
-  - Disparar registro de estatística de acesso (assíncrono ou síncrono)
-- Configurar política de eviction do Redis (allkeys-lru ou allkeys-lfu) e TTL padrão das entradas
-- Criar controller/rota: GET /:shortcode (redirect 302 para a URL original)
-- Tratar shortcode inexistente (404)
-- Testes unitários do usecase de redirecionamento (cache hit, cache miss com populate, expirado, não encontrado)
-- Testes de integração da rota GET /:shortcode
+- [x] Criar usecase redirect-url:
+  - [x] Buscar shortcode no cache Redis (cache-aside); em cache miss, buscar no cassandra (consistency level ONE) e popular o Redis com TTL
+  - [x] Validar se a URL não expirou (retornar 410 Gone se expirada)
+  - [x] Incrementar contador de acessos do shortcode (ex: Redis)
+  - [x] Disparar registro de estatística de acesso (assíncrono ou síncrono)
+- [x] Configurar política de eviction do Redis (allkeys-lru ou allkeys-lfu) e TTL padrão das entradas
+- [x] Criar controller/rota: GET /:shortcode (redirect 302 para a URL original)
+- [x] Tratar shortcode inexistente (404)
+- [x] Testes unitários do usecase de redirecionamento (cache hit, cache miss com populate, expirado, não encontrado)
+- [x] Testes de integração da rota GET /:shortcode
 
 # decision
 - Cache-aside: tenta Redis antes do Cassandra; em miss, busca no Cassandra e grava no Redis com TTL

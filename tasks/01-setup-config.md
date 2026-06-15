@@ -1,10 +1,10 @@
 # contex
-Configurar servidor com hono
-Configurar bun no projeto
-Configurar setup de test - vamos utilizar jest
-Configurar typescript
-Configurar docker compose para ambiente local contento uma instacia do cassandra e outra do redis
-Configurar variaveis de ambiente - PORT, ENV, SALT_SECRET, DATABASE_URL, REDIS_URL
+- [x] Configurar servidor com hono
+- [x] Configurar bun no projeto
+- [x] Configurar setup de test - vamos utilizar jest
+- [x] Configurar typescript
+- [x] Configurar docker compose para ambiente local contento uma instacia do cassandra e outra do redis
+- [x] Configurar variaveis de ambiente - PORT, ENV, SALT_SECRET, DATABASE_URL, REDIS_URL
 
 # estrutura 
 -src
