@@ -22,6 +22,12 @@ export class RedisAccessStatsRecorder implements AccessStatsRecorder {
       logger.error({ error, shortcode }, 'Failed to record short URL access');
     }
   }
+
+  async getAccessCount(shortcode: string): Promise<number> {
+    const value = await this.redis.get(accessCounterKey(shortcode));
+
+    return value ? Number.parseInt(value, 10) : 0;
+  }
 }
 
 function accessCounterKey(shortcode: string): string {

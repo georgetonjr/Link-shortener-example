@@ -3,9 +3,11 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import type { AppBindings, AppVariables } from '@/application/shared/app-context';
 import { CassandraShortUrlRepository } from '@/application/repository/short-url-repository';
+import { CassandraAccessLogRepository } from '@/application/repository/access-log-repository';
 import { RedisShortUrlCache } from '@/application/services/redis-short-url-cache';
 import { RedisAccessStatsRecorder } from '@/application/services/redis-access-stats-recorder';
 import { RedirectUrlUseCase } from '@/domain/usecase/redirect-url';
+import { RegisterAccessUseCase } from '@/domain/usecase/register-access';
 import type { CassandraClient } from '@/infra/cassandra/client';
 import type { RedisClient } from '@/infra/redis/client';
 
@@ -26,12 +28,19 @@ export function createRedirectController(cassandra: CassandraClient, redis: Redi
   const shortUrlRepository = new CassandraShortUrlRepository(cassandra);
   const shortUrlCache = new RedisShortUrlCache(redis);
   const accessStatsRecorder = new RedisAccessStatsRecorder(redis);
+  const accessLogRepository = new CassandraAccessLogRepository(cassandra);
+  const registerAccess = new RegisterAccessUseCase(accessStatsRecorder, accessLogRepository);
 
   app.get('/:shortcode', zValidator('param', redirectParamsSchema), async (c) => {
     const { shortcode } = c.req.valid('param');
 
-    const usecase = new RedirectUrlUseCase(shortUrlRepository, shortUrlCache, accessStatsRecorder);
-    const { originalUrl } = await usecase.execute({ code: shortcode });
+    const usecase = new RedirectUrlUseCase(shortUrlRepository, shortUrlCache, registerAccess);
+    const { originalUrl } = await usecase.execute({
+      code: shortcode,
+      referrer: c.req.header('referer') ?? null,
+      userAgent: c.req.header('user-agent') ?? null,
+      ip: c.req.header('x-forwarded-for')?.split(',')[0]?.trim() ?? null,
+    });
 
     return c.redirect(originalUrl, REDIRECT_STATUS_CODE);
   });
