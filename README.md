@@ -18,6 +18,8 @@ bun run dev
 
 Health check: `GET http://localhost:3000/health`
 
+Documentação da API (Swagger UI): `GET http://localhost:3000/docs`
+
 ## Scripts
 
 - `bun run dev` — inicia o servidor em modo watch

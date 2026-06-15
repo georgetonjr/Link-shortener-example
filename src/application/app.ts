@@ -6,6 +6,7 @@ import { requestIdMiddleware } from '@/application/shared/request-id-middleware'
 import { createAuthController } from '@/application/controller/auth-controller';
 import { createShortUrlController } from '@/application/controller/short-url-controller';
 import { createRedirectController } from '@/application/controller/redirect-controller';
+import { createDocsController } from '@/application/controller/docs-controller';
 import type { CassandraClient } from '@/infra/cassandra/client';
 import type { RedisClient } from '@/infra/redis/client';
 
@@ -34,6 +35,7 @@ export function createApp(dependencies: AppDependencies): App {
 
   app.route('/auth', createAuthController(dependencies.cassandra));
   app.route('/urls', createShortUrlController(dependencies.cassandra, dependencies.redis));
+  app.route('/docs', createDocsController());
 
   // Rota de redirecionamento (catch-all GET /:shortcode): registrada por último
   // para não conflitar com as demais rotas (/health, /auth, /urls).

@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
+import { z } from '@/application/shared/zod-openapi';
 import type { AppBindings, AppVariables } from '@/application/shared/app-context';
 import { CassandraUserRepository } from '@/application/repository/user-repository';
 import { BcryptPasswordHasher } from '@/application/services/bcrypt-password-hasher';
@@ -9,14 +9,17 @@ import { SignupUserUseCase } from '@/domain/usecase/signup-user';
 import { LoginUserUseCase } from '@/domain/usecase/login-user';
 import type { CassandraClient } from '@/infra/cassandra/client';
 
-const signupSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8, 'Password must be at least 8 characters long'),
+export const signupSchema = z.object({
+  email: z.string().email().openapi({ example: 'user@example.com' }),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters long')
+    .openapi({ example: 'super-secret-password' }),
 });
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+export const loginSchema = z.object({
+  email: z.string().email().openapi({ example: 'user@example.com' }),
+  password: z.string().min(1).openapi({ example: 'super-secret-password' }),
 });
 
 /**
