@@ -47,6 +47,10 @@ export class RedisShortUrlCache implements ShortUrlCache {
   async set(code: string, shortUrl: ShortUrl): Promise<void> {
     await this.redis.set(cacheKey(code), JSON.stringify(toCached(shortUrl)), this.ttlSeconds);
   }
+
+  async delete(code: string): Promise<void> {
+    await this.redis.del(cacheKey(code));
+  }
 }
 
 function cacheKey(code: string): string {
