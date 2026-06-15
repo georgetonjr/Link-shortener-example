@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
+import { z } from '@/application/shared/zod-openapi';
 import type { AppBindings, AppVariables } from '@/application/shared/app-context';
 import { authMiddleware, optionalAuthMiddleware } from '@/application/shared/auth-middleware';
 import { CassandraShortUrlRepository } from '@/application/repository/short-url-repository';
@@ -21,32 +21,40 @@ const MAX_RECENT_ACCESSES_LIMIT = 100;
 const MAX_LIST_URLS_LIMIT = 100;
 const NO_CONTENT_STATUS = 204;
 
-const createShortUrlSchema = z.object({
-  originalUrl: z.string().min(1, 'originalUrl is required'),
+export const createShortUrlSchema = z.object({
+  originalUrl: z
+    .string()
+    .min(1, 'originalUrl is required')
+    .openapi({ example: 'https://example.com/some/long/path' }),
   customAlias: z
     .string()
     .min(3, 'customAlias must have at least 3 characters')
     .max(32, 'customAlias must have at most 32 characters')
     .regex(ALIAS_PATTERN, 'customAlias must contain only letters, numbers, "_" or "-"')
-    .optional(),
-  expiresAt: z.string().datetime({ message: 'expiresAt must be an ISO 8601 date' }).optional(),
+    .optional()
+    .openapi({ example: 'my-alias' }),
+  expiresAt: z
+    .string()
+    .datetime({ message: 'expiresAt must be an ISO 8601 date' })
+    .optional()
+    .openapi({ example: '2026-12-31T23:59:59.000Z' }),
 });
 
-const shortcodeParamsSchema = z.object({
-  shortcode: z.string().min(1, 'shortcode is required'),
+export const shortcodeParamsSchema = z.object({
+  shortcode: z.string().min(1, 'shortcode is required').openapi({ example: 'aB3x' }),
 });
 
-const statsQuerySchema = z.object({
+export const statsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_RECENT_ACCESSES_LIMIT).optional(),
   cursor: z.string().datetime({ message: 'cursor must be an ISO 8601 date' }).optional(),
 });
 
-const listUserUrlsQuerySchema = z.object({
+export const listUserUrlsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_LIST_URLS_LIMIT).optional(),
   cursor: z.string().datetime({ message: 'cursor must be an ISO 8601 date' }).optional(),
 });
 
-const updateShortUrlSchema = z
+export const updateShortUrlSchema = z
   .object({
     customAlias: z
       .string()
@@ -54,12 +62,14 @@ const updateShortUrlSchema = z
       .max(32, 'customAlias must have at most 32 characters')
       .regex(ALIAS_PATTERN, 'customAlias must contain only letters, numbers, "_" or "-"')
       .nullable()
-      .optional(),
+      .optional()
+      .openapi({ example: 'my-new-alias' }),
     expiresAt: z
       .string()
       .datetime({ message: 'expiresAt must be an ISO 8601 date' })
       .nullable()
-      .optional(),
+      .optional()
+      .openapi({ example: '2026-12-31T23:59:59.000Z' }),
   })
   .refine((data) => data.customAlias !== undefined || data.expiresAt !== undefined, {
     message: 'At least one of customAlias or expiresAt must be provided',

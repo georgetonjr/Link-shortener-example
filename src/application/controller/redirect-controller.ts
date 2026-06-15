@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
+import { z } from '@/application/shared/zod-openapi';
 import type { AppBindings, AppVariables } from '@/application/shared/app-context';
 import { CassandraShortUrlRepository } from '@/application/repository/short-url-repository';
 import { CassandraAccessLogRepository } from '@/application/repository/access-log-repository';
@@ -13,8 +13,8 @@ import type { RedisClient } from '@/infra/redis/client';
 
 const REDIRECT_STATUS_CODE = 302;
 
-const redirectParamsSchema = z.object({
-  shortcode: z.string().min(1, 'shortcode is required'),
+export const redirectParamsSchema = z.object({
+  shortcode: z.string().min(1, 'shortcode is required').openapi({ example: 'aB3x' }),
 });
 
 /**
