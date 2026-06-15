@@ -1,5 +1,7 @@
 # Link Shortener
 
+[![CI](https://github.com/georgetonjr/Link-shortener-example/actions/workflows/ci.yml/badge.svg)](https://github.com/georgetonjr/Link-shortener-example/actions/workflows/ci.yml)
+
 Encurtador de URLs construído com Hono, Bun, TypeScript, Cassandra e Redis.
 
 ## Requisitos
